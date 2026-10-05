@@ -18,7 +18,6 @@ import hashlib
 import hmac
 import json
 import os
-import re
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
@@ -1113,7 +1112,7 @@ class KMSAuditor:
         except (json.JSONDecodeError, AttributeError):
             rotating = False
         return Finding(
-            "CIS-3.7", f"KMS key con rotación automática activada", "MEDIUM",
+            "CIS-3.7", "KMS key con rotación automática activada", "MEDIUM",
             Status.PASS if rotating else Status.FAIL,
             resource=key_id[:12] + "…",
             detail="" if rotating else f"Key {key_id[:12]}… sin rotación automática",

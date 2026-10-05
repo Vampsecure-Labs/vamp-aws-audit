@@ -4,10 +4,9 @@ Tests unitarios para vamp-aws-audit.
 
 Ejecutar: pytest tests/test_unit.py -v -m "not integration"
 """
-import asyncio
 import json
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 from vamp_aws_audit import (
     AWSConfig,
@@ -142,7 +141,6 @@ class TestIAMAuditor:
     @pytest.mark.asyncio
     async def test_root_mfa_activado(self, cfg):
         client = self._make_client(cfg)
-        import xml.etree.ElementTree as ET
         xml_body = """
         <GetAccountSummaryResponse>
           <GetAccountSummaryResult>

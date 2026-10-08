@@ -130,5 +130,43 @@ Uso exclusivo en auditorías autorizadas. El uso no autorizado es ilegal.
 
 ---
 
+## Why vamp-aws-audit vs Prowler · ScoutSuite · CloudSploit
+
+| Feature | vamp-aws-audit | Prowler | ScoutSuite | CloudSploit |
+|---------|----------------|---------|------------|-------------|
+| Zero AWS SDK dependency (no boto3) | ✅ | ❌ (boto3) | ❌ (boto3) | ❌ (AWS SDK) |
+| Native SigV4 via stdlib (hmac+hashlib) | ✅ | ❌ | ❌ | ❌ |
+| CIS AWS Foundations Benchmark v3.0.0 | ✅ 71 controls | ✅ | ✅ | ⚠️ partial |
+| Async aiohttp (parallel module execution) | ✅ | ⚠️ | ⚠️ | ❌ |
+| Air-gap / offline capable | ✅ | ❌ | ❌ | ❌ |
+| VSL client report (HTML/PDF) | ✅ | ⚠️ HTML | ⚠️ HTML | ✅ (SaaS) |
+| CI/CD exit codes (0/1/2) | ✅ | ✅ | ⚠️ | ⚠️ |
+| Multi-cloud coverage | ❌ (AWS only) | ✅ | ✅ | ✅ |
+| License | AGPL-3.0 | Apache 2.0 | GPL-2.0 | AGPL-3.0 |
+
+**Key differentiators:**
+
+- **No boto3, no AWS CLI**: implements AWS Signature Version 4 natively with `hmac`+`hashlib` from the Python stdlib. Runs in any minimal Python environment without installing the AWS SDK or configuring credential profiles.
+- **Air-gap friendly**: the only network requirement is connectivity to AWS API endpoints. No package manager calls, no metadata token fetches — a single `pip install aiohttp rich` is the full dependency surface.
+- **71 CIS Level 1 controls in one async pass**: IAM credential hygiene, S3 public access, CloudTrail multi-region, VPC security groups, RDS encryption, KMS key rotation, and GuardDuty status — all covered in a single run.
+- **Deterministic CI/CD exit codes**: `0` (clean), `1` (HIGH findings), `2` (CRITICAL findings) — a clean integration point for Forgejo/GitHub Actions gates without parsing JSON output.
+
+## Check Coverage
+
+| Check ID | Description | Standard | Severity |
+|----------|-------------|----------|----------|
+| CIS-1.4 | Root account has active access keys | CIS AWS 1.4 / NIST SP 800-53 AC-2 | CRITICAL |
+| CIS-1.14 | Root account does not have MFA enabled | CIS AWS 1.14 / NIST SP 800-53 IA-5 | CRITICAL |
+| CIS-1.2 | IAM user without MFA enabled | CIS AWS 1.2 / NIST SP 800-53 IA-5 | HIGH |
+| CIS-1.3 | IAM credentials unused for 90+ days not disabled | CIS AWS 1.3 / NIST SP 800-53 AC-2 | HIGH |
+| CIS-1.5 | IAM password policy: minimum password length below 14 | CIS AWS 1.5 / NIST SP 800-63B §5.1.1 | MEDIUM |
+| CIS-2.1.5 | S3 bucket with public access block not enabled | CIS AWS 2.1.5 / NIST SP 800-53 AC-3 | HIGH |
+| CIS-2.2.1 | S3 bucket without server-side encryption enabled | CIS AWS 2.2.1 / NIST SP 800-53 SC-28 | MEDIUM |
+| CIS-3.1 | CloudTrail not enabled across all AWS regions | CIS AWS 3.1 / NIST SP 800-53 AU-2 | CRITICAL |
+| CIS-3.7 | CloudTrail log files not encrypted with a KMS CMK | CIS AWS 3.7 / NIST SP 800-53 AU-9 | MEDIUM |
+| CIS-5.1 | Default VPC security group allows all inbound or outbound traffic | CIS AWS 5.1 / NIST SP 800-53 SC-7 | HIGH |
+| CIS-5.2 | SSH port 22 open to `0.0.0.0/0` in a security group | CIS AWS 5.2 / NIST SP 800-53 SC-7 | CRITICAL |
+| CIS-GD-1 | GuardDuty not enabled in the audited region | AWS Well-Architected SEC 1 / NIST SP 800-53 SI-4 | HIGH |
+
 ## Versión
 v1.0.0 — VampSecure Labs Security Research Division

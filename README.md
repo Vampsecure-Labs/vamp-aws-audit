@@ -75,6 +75,10 @@ python vamp_aws_audit.py --modules ec2
 | `--region`      | AWS region (default: `us-east-1`)             |
 | `--modules`     | Modules to run: `iam s3 ec2 cloudtrail rds kms guardduty config` |
 | `--fmt`         | Output format: `rich` (default) or `json`     |
+| `--out`         | Write the raw findings as JSON                |
+| `--report-html` | Write the VSL client engagement report (HTML) |
+| `--report-pdf`  | Write the VSL client engagement report (PDF, needs `fpdf2`) |
+| `--client` / `--engagement` / `--auditor` | Engagement metadata embedded in the report |
 | `--out FILE`    | Save findings to JSON                         |
 
 ---
@@ -82,7 +86,7 @@ python vamp_aws_audit.py --modules ec2
 ### Sample Output
 
 ```
-  vamp-aws-audit v1.0.1 · CIS AWS Level 1 · 8 modules
+  vamp-aws-audit v1.1.0 · CIS AWS Level 1 · 8 modules
   Region: us-east-1  Modules: iam, s3, ec2, cloudtrail, rds, kms, guardduty, config
   ✓ Authenticated: arn:aws:iam::123456789012:user/auditor
 
@@ -174,6 +178,7 @@ This auditor **does not use boto3** or any AWS SDK library. It implements AWS Si
 
 | Version | Main changes |
 |---------|-------------|
+| v1.1.0 | VSL client engagement report (HTML + PDF) via the shared `vampsec_report` module: `--report-html`/`--report-pdf` + `--client`/`--engagement`/`--auditor`. The comparison table advertised it; the CLI now delivers it. |
 | v1.0.1 | Bilingual README (EN/ES) |
 | v1.0.0 | Initial release: CIS AWS Foundations Benchmark Level 1, 71 controls, 8 modules, native SigV4, async aiohttp |
 
@@ -249,6 +254,10 @@ python vamp_aws_audit.py --modules ec2
 | `--region`      | Región AWS (default: `us-east-1`)             |
 | `--modules`     | Módulos a ejecutar: `iam s3 ec2 cloudtrail rds kms guardduty config` |
 | `--fmt`         | Formato de salida: `rich` (default) o `json`  |
+| `--out`         | Guardar los hallazgos crudos como JSON        |
+| `--report-html` | Informe de cliente VSL (HTML)                 |
+| `--report-pdf`  | Informe de cliente VSL (PDF, requiere `fpdf2`) |
+| `--client` / `--engagement` / `--auditor` | Metadatos del engagement en el informe |
 | `--out FILE`    | Guardar findings en JSON                      |
 
 ---
@@ -256,7 +265,7 @@ python vamp_aws_audit.py --modules ec2
 ### Ejemplo de salida
 
 ```
-  vamp-aws-audit v1.0.1 · CIS AWS Level 1 · 8 módulos
+  vamp-aws-audit v1.1.0 · CIS AWS Level 1 · 8 módulos
   Región: us-east-1  Módulos: iam, s3, ec2, cloudtrail, rds, kms, guardduty, config
   ✓ Autenticado: arn:aws:iam::123456789012:user/auditor
 
@@ -348,6 +357,7 @@ Este auditor **no usa boto3** ni ninguna librería de AWS SDK. Implementa AWS Si
 
 | Versión | Cambios principales |
 |---------|---------------------|
+| v1.1.0 | Informe de cliente VSL (HTML + PDF) vía el módulo compartido `vampsec_report`: `--report-html`/`--report-pdf` + `--client`/`--engagement`/`--auditor`. La tabla comparativa lo anunciaba; ahora la CLI lo entrega. |
 | v1.0.1 | README bilingüe (EN/ES) |
 | v1.0.0 | Primera versión: CIS AWS Foundations Benchmark Level 1, 71 controles, 8 módulos, SigV4 nativo, aiohttp asíncrono |
 

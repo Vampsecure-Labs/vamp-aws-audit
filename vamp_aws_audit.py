@@ -40,7 +40,7 @@ except ImportError:
     _RICH = False
 
 TOOL_NAME = "vamp-aws-audit"
-VERSION   = "1.0.0"
+VERSION   = "1.1.0"
 
 # ─── colores de severidad ───────────────────────────────────────────────────
 SEV_COLOR = {"CRITICAL": "red", "HIGH": "orange1", "MEDIUM": "yellow",
@@ -1355,7 +1355,34 @@ def _parse_args():
                    help="Formato de salida (default: rich)")
     p.add_argument("--out",        help="Fichero JSON de salida")
     p.add_argument("--version",    action="version", version=f"{TOOL_NAME} v{VERSION}")
+    from vampsec_report import add_report_args
+    add_report_args(p)
     return p.parse_args()
+
+
+def _findings_vsl(findings: "List[Finding]") -> list:
+    """Convierte los Finding de aws-audit al formato unificado VSL (vampsec_report)."""
+    from vampsec_report import Finding as VF
+    out: list = []
+    for f in findings:
+        # Solo incumplimientos reales (no PASS/SKIP/ERROR informativos)
+        if f.status not in (Status.FAIL, Status.WARN):
+            continue
+        evidence = f.status.value
+        if f.resource:
+            evidence += f" · {f.resource}"
+        if f.region:
+            evidence += f" · {f.region}"
+        out.append(VF(
+            id=f.check_id,
+            title=f.title,
+            severity=f.severity,
+            description=f.detail or f.title,
+            evidence=evidence,
+            affected=f.resource or "cuenta AWS",
+            remediation=f.remediation,
+        ))
+    return out
 
 
 async def _main():
@@ -1404,6 +1431,22 @@ async def _main():
         pathlib.Path(args.out).write_text(json.dumps(out_data, indent=2, ensure_ascii=False))
         if console:
             console.print(f"  → JSON guardado en {args.out}")
+
+    # Informe de cliente VSL (HTML/PDF con metadatos de engagement)
+    report_html = getattr(args, "report_html", None)
+    report_pdf  = getattr(args, "report_pdf", None)
+    if report_html or report_pdf:
+        from vampsec_report import VampSecReport, meta_from_args
+        rep = VampSecReport(meta=meta_from_args(args, TOOL_NAME, VERSION),
+                            findings=_findings_vsl(findings))
+        if report_html:
+            rep.to_html_client(report_html)
+            if console:
+                console.print(f"  → Informe cliente HTML: {report_html}")
+        if report_pdf:
+            rep.to_pdf(report_pdf)
+            if console:
+                console.print(f"  → Informe cliente PDF: {report_pdf}")
 
     # Código de salida: 2 si hay CRITICALes, 1 si hay HIGHs, 0 si todo OK
     crits = sum(1 for f in findings if f.status in (Status.FAIL,) and f.severity == "CRITICAL")

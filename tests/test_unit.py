@@ -487,3 +487,54 @@ class TestAWSAuditor:
     def test_filtro_de_modulos(self, cfg):
         auditor = AWSAuditor(cfg, ["iam", "s3"])
         assert auditor.modules == ["iam", "s3"]
+
+
+# ---------------------------------------------------------------------------
+# Informe de cliente VSL (v1.1.0) — el README prometía HTML/PDF sin cablearlo
+# ---------------------------------------------------------------------------
+
+class TestInformeVSL:
+    def _findings(self):
+        from vamp_aws_audit import Finding, Status
+        return [
+            Finding(check_id="CIS-1.4", title="Root sin MFA", severity="CRITICAL",
+                    status=Status.FAIL, resource="root", region="us-east-1",
+                    detail="MFA no activada en root", remediation="Activar MFA en root"),
+            Finding(check_id="CIS-2.1", title="S3 cifrado", severity="HIGH",
+                    status=Status.PASS, resource="bucket-x"),
+            Finding(check_id="CIS-3.1", title="CloudTrail", severity="MEDIUM",
+                    status=Status.WARN, resource="trail", detail="single-region"),
+        ]
+
+    def test_findings_vsl_solo_incumplimientos(self):
+        from vamp_aws_audit import _findings_vsl
+        vsl = _findings_vsl(self._findings())
+        ids = {f.id for f in vsl}
+        assert ids == {"CIS-1.4", "CIS-3.1"}      # FAIL + WARN, no PASS
+
+    def test_parser_expone_flags_informe(self):
+        import sys
+        from vamp_aws_audit import _parse_args
+        old = sys.argv
+        sys.argv = ["x", "--access-key", "A", "--secret-key", "S",
+                    "--client", "Acme", "--report-html", "r.html", "--report-pdf", "r.pdf"]
+        try:
+            args = _parse_args()
+            assert args.client == "Acme" and args.report_html == "r.html" and args.report_pdf == "r.pdf"
+        finally:
+            sys.argv = old
+
+    def test_informe_html(self, tmp_path):
+        import argparse
+        from vamp_aws_audit import _findings_vsl, VERSION, TOOL_NAME
+        from vampsec_report import VampSecReport, meta_from_args
+        rep = VampSecReport(meta=meta_from_args(argparse.Namespace(client="Acme"), TOOL_NAME, VERSION),
+                            findings=_findings_vsl(self._findings()))
+        out = tmp_path / "r.html"
+        rep.to_html_client(str(out))
+        html = out.read_text()
+        assert "<html" in html.lower() and "CIS-1.4" in html
+
+    def test_version_1_1_0(self):
+        from vamp_aws_audit import VERSION
+        assert VERSION == "1.1.0"

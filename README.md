@@ -86,7 +86,7 @@ python vamp_aws_audit.py --modules ec2
 ### Sample Output
 
 ```
-  vamp-aws-audit v1.1.0 · CIS AWS Level 1 · 8 modules
+  vamp-aws-audit v1.1.1 · CIS AWS Level 1 · 8 modules
   Region: us-east-1  Modules: iam, s3, ec2, cloudtrail, rds, kms, guardduty, config
   ✓ Authenticated: arn:aws:iam::123456789012:user/auditor
 
@@ -265,7 +265,7 @@ python vamp_aws_audit.py --modules ec2
 ### Ejemplo de salida
 
 ```
-  vamp-aws-audit v1.1.0 · CIS AWS Level 1 · 8 módulos
+  vamp-aws-audit v1.1.1 · CIS AWS Level 1 · 8 módulos
   Región: us-east-1  Módulos: iam, s3, ec2, cloudtrail, rds, kms, guardduty, config
   ✓ Autenticado: arn:aws:iam::123456789012:user/auditor
 

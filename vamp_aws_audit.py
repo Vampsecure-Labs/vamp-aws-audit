@@ -40,7 +40,7 @@ except ImportError:
     _RICH = False
 
 TOOL_NAME = "vamp-aws-audit"
-VERSION   = "1.1.0"
+VERSION   = "1.1.1"
 
 # ─── colores de severidad ───────────────────────────────────────────────────
 SEV_COLOR = {"CRITICAL": "red", "HIGH": "orange1", "MEDIUM": "yellow",

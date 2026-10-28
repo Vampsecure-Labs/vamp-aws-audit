@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name            = "vamp-aws-audit"
-version         = "1.1.0"
+version = "1.1.1"
 description     = "Auditor CIS AWS Level 1 — 71 controles IAM/S3/EC2/CloudTrail/RDS/KMS/GuardDuty/Config"
 readme          = "README.md"
 license         = { text = "AGPL-3.0-only" }
